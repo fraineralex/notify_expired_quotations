@@ -37,6 +37,12 @@ Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [
     $ git clone https://github.com/fraineralex/notify_expired_quotations
 # Access
     $ cd notify_expired_quotations
-# Run the project
-# The server will execute and you will see schequeduled actions set to excute every day to chek out the expired quotations.
+# Run the server
+# Update your odoo list of apps and install the module called: 'Notify Expired Quotations'.
+# Then you will see a schequeduled action set to excute every day to chek out the expired quotations.
 ```
+
+## 👨🏻‍🚀 Developer
+- Frainer Encarnación --> [Github](https://github.com/fraineralex)
+
+&#xa0;
