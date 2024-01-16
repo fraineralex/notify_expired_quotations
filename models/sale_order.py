@@ -7,16 +7,16 @@ class SaleOrderInherit(models.Model):
     
     def notify_expired_quotations(self):
         current_date = datetime.datetime.now().date()
-        initial_date = datetime.date(2023, 12, 14)
-        expired_sale_quotes = self.env['sale.order'].search([
+        initial_date = datetime.date(2023, 1, 15)
+        expired_quotations = self.env['sale.order'].search([
         ('validity_date', '<=', current_date),
         ('validity_date', '>', initial_date),
-        ('state', 'not in', ['cancel', 'done'])
+        ('state', 'in', ['draft', 'sent'])
         ])
         report_service = self.env['ir.actions.report']
         
-        for quote in expired_sale_quotes:
-            subject = "La cotización número: '{}' ha vencido".format(quote.name)
+        for quotation in expired_quotations:
+            subject = "La cotización número: '{}' ha vencido".format(quotation.name)
             body = """
                 <p>Estimado/a Sr./Sra.: <strong>{}</strong></p>
 
@@ -33,38 +33,42 @@ class SaleOrderInherit(models.Model):
 
                 <p>Saludos cordiales,</p>
                 <p><strong>Equipo de Transporte Sheila</strong></p>
-            """.format(quote.partner_id.name, quote.name, quote.name, quote.user_id.name, quote.amount_total, quote.date_order)
+            """.format(quotation.partner_id.name, quotation.name, quotation.name, quotation.user_id.name, quotation.amount_total, quotation.date_order)
             report = report_service._get_report_from_name('sale.report_saleorder')
-            report_pdf = report._render_qweb_pdf([quote.id])[0]
+            report_pdf = report._render_qweb_pdf([quotation.id])[0]
             report_pdf_b64 = base64.b64encode(report_pdf)
 
             attachment = self.env['ir.attachment'].create({
-            'name': 'Cotización {}.pdf'.format(quote.name),
+            'name': 'Cotización {}.pdf'.format(quotation.name),
             'type': 'binary',
             'datas': report_pdf_b64,
             'res_model': 'sale.order',
-            'res_id': quote.id
+            'res_id': quotation.id
             })
             
             message = self.env['mail.message'].create({
                 'body': body,
                 'subject': subject,
                 'message_type': 'comment',
-                'partner_ids': [(4, quote.partner_id.id)],
+                'partner_ids': [(4, quotation.partner_id.id)],
                 'model': 'sale.order',
-                'res_id': quote.id,
+                'res_id': quotation.id,
             })
             
             mail_id = self.env['mail.mail'].create({
                 'subject': subject,
                 'author_id': self.env.user.partner_id.id,
                 'body_html': body,
-                'email_to': quote.partner_id.email,
+                'email_to': quotation.partner_id.email,
                 'mail_message_id': message.id,
                 'auto_delete': True,
                 'state': 'outgoing',
                 'attachment_ids': [(4, attachment.id)]
             })
 
+            channel = self.env['mail.channel'].search([('name', '=', 'general')], limit=1)
+            subtype = self.env.ref('mail.mt_comment') 
+            
             mail_id.send()
-            quote.action_cancel()
+            channel.message_post(message_type='comment', body=body,  subtype_id=subtype.id, attachment_ids=[attachment.id])
+            quotation.write({'state': 'cancel'})
