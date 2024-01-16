@@ -4,9 +4,9 @@
     'category': 'Sales',
     'summary': 'Notify to the clients their expired quotations and cancel them automatically',
     'sequence': 10,
-    'author': 'Lifter',
-    'maintainer': 'Frainer Encarnación',
-    'website': 'lifterdo.com',
+    'author': 'Frainer Encarnación',
+    'maintainer': 'fraineralex2001@gmail.com',
+    'website': 'fraineralex.com',
     'depends': ['sale'],
     'data': [
         'data/ir_cron.xml'],
