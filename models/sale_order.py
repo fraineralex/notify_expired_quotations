@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, _
 import base64
 import datetime
 
@@ -7,10 +7,8 @@ class SaleOrderInherit(models.Model):
     
     def notify_expired_quotations(self):
         current_date = datetime.datetime.now().date()
-        initial_date = datetime.date(2023, 1, 15)
         expired_quotations = self.env['sale.order'].search([
-        ('validity_date', '<=', current_date),
-        ('validity_date', '>', initial_date),
+        ('validity_date', '=', current_date),
         ('state', 'in', ['draft', 'sent'])
         ])
         report_service = self.env['ir.actions.report']
