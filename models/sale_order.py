@@ -14,6 +14,8 @@ class SaleOrderInherit(models.Model):
         report_service = self.env['ir.actions.report']
         
         for quotation in expired_quotations:
+            quotation.write({'state': 'cancel'})
+            
             subject = "La cotización número: '{}' ha vencido".format(quotation.name)
             body = """
                 <p>Estimado/a Sr./Sra.: <strong>{}</strong></p>
@@ -64,9 +66,9 @@ class SaleOrderInherit(models.Model):
                 'attachment_ids': [(4, attachment.id)]
             })
 
+            
             channel = self.env['mail.channel'].search([('name', '=', 'general')], limit=1)
             subtype = self.env.ref('mail.mt_comment') 
             
             mail_id.send()
             channel.message_post(message_type='comment', body=body,  subtype_id=subtype.id, attachment_ids=[attachment.id])
-            quotation.write({'state': 'cancel'})
