@@ -6,7 +6,7 @@
     'sequence': 10,
     'author': 'Frainer Encarnación',
     'maintainer': 'fraineralex2001@gmail.com',
-    'website': 'fraineralex.com',
+    'website': 'https://fraineralex.dev',
     'depends': ['sale'],
     'data': [
         'data/ir_cron.xml'],

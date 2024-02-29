@@ -32,8 +32,8 @@ class SaleOrderInherit(models.Model):
                 <p>Si desea proceder a utilizar el servicio cotizado, debe comunicarse con nosotros para validar la disponibilidad de la misma y esperar la autorización para proceder con el pago.</p>
 
                 <p>Saludos cordiales,</p>
-                <p><strong>Equipo de Transporte Sheila</strong></p>
-            """.format(quotation.partner_id.name, quotation.name, quotation.name, quotation.user_id.name, quotation.amount_total, quotation.date_order)
+                <p><strong>Equipo de {}</strong></p>
+            """.format(quotation.partner_id.name, quotation.name, quotation.name, quotation.user_id.name, quotation.amount_total, quotation.date_order, self.env.user.company_id.name)
             report = report_service._get_report_from_name('sale.report_saleorder')
             report_pdf = report._render_qweb_pdf([quotation.id])[0]
             report_pdf_b64 = base64.b64encode(report_pdf)
